@@ -375,6 +375,13 @@ is still a launch video that doesn't look AI-made, so the motion rules are ident
 is where the decisions come from: the category's type file and measured donor numbers, instead of
 one reference.
 
+
+**Banned in Original mode (reviewer note, 2026-09-29): the generic AI launch-video look.** No
+glassmorphism or frosted-glass panels, no floating cards sliding up from below, no gradient blobs,
+no default fonts, and nothing that looks like a stock HyperFrames or Remotion template. The
+`liquid-glass-ui` type is for cloning a reference that is actually built that way; never pick it
+for an original. Test every shot: if it could appear in any AI launch video, redo it.
+
 1. **Pick the category.** Read the product (launch page, UI, what it does) and choose the ONE type
    file whose "Looks like" row fits best (the table in *Pick the type file first*). A model/AI launch is usually `ui-showcase`
    (the product's own interface doing a real task) or `kinetic-type-into-ui`. A physical product is
