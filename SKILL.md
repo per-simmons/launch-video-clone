@@ -1,15 +1,18 @@
 ---
 name: launch-video-clone
-description: Make product-launch / motion-graphics videos in HyperFrames, in two modes. ORIGINAL (no reference): pick a category from the type files and build a launch video from scratch with the skill's motion rules. CLONE: rebuild a reference video as closely as possible — same shots, timing, easing, transitions and type — in HyperFrames, optionally re-skinned for a different brand. Opus can't watch video, so a burst-frame analyzer turns the reference into per-shot frame sequences, motion trails, easing curves and beat maps it CAN read, and a compare tool grades each render against the reference frame for frame until they match. Raster imagery comes from an image model (gpt-image or similar). Has one type file per kind of motion (UI showcase, abstract 3D diagram, 3D product, editorial collage). Use when the user says "make a launch video for <product>", "launch video for this release", "clone this launch video", "recreate this motion video", "make one like this for <brand>", "get as close to this as possible", or drops an X/YouTube link to a launch video and wants it rebuilt.
+description: Make product-launch / motion-graphics videos in HyperFrames, in three modes. ORIGINAL (no reference): pick a category from the type files and build a launch video from scratch with the skill's motion rules. CLONE: rebuild a reference video as closely as possible — same shots, timing, easing, transitions and type — in HyperFrames, optionally re-skinned for a different brand. Opus can't watch video, so a burst-frame analyzer turns the reference into per-shot frame sequences, motion trails, easing curves and beat maps it CAN read, and a compare tool grades each render against the reference frame for frame until they match. Raster imagery comes from an image model (gpt-image or similar). HYBRID: real camera footage with motion graphics inside it (footage turning into a paper-collage 3D world, a product UI typing the speaker's words, footage-to-graphics transitions, voice-over beat timing), via the sub-skills in subskills/. Has one type file per kind of motion (UI showcase, abstract 3D diagram, 3D product, editorial collage). Use when the user says "make a launch video for <product>", "launch video for this release", "clone this launch video", "recreate this motion video", "make one like this for <brand>", "get as close to this as possible", or drops an X/YouTube link to a launch video and wants it rebuilt, or wants graphics, a collage or a UI overlay built into footage of a person on camera.
 ---
 
 # Launch Video Clone
 
-**Two modes. Pick one before anything else.**
+**Three modes. Pick one before anything else.**
 - **Original** (no reference video): you are making a launch video for a product from scratch.
   Go to **Original mode** below. It uses the type files, `references/motion-feel.md` and steps 3-7
   of this file, and skips the cloning steps.
 - **Clone** (a reference video is given): everything below, starting at *Pick the type file first*.
+- **Hybrid** (real camera footage + motion graphics, e.g. a creator's sponsor spot or an explainer
+  where the person on camera hands off to graphics and back): go to **Hybrid mode** below. It routes
+  to the sub-skills in `subskills/`.
 
 In clone mode, you are rebuilding a reference video, not "making something in its style". The target is a
 side-by-side where a viewer has to look twice. Every decision (shot length, when a word lands,
@@ -367,6 +370,43 @@ Put tools you had to write in `<project>/tools/` and list them under Skill feedb
 on what each one does. Don't edit the skill's own files; the orchestrating agent merges lessons
 into SKILL.md, the type files and the references, so parallel clones don't collide. Reviewer notes
 always get merged: every one so far became a rule (see references/motion-feel.md).
+
+## Hybrid mode (real footage + motion graphics)
+
+Use this when live-action footage carries the piece and graphics happen inside it: a freeze that turns
+into a collage, a stat shown literally, a product UI typing what the speaker says, a reveal that hands
+back to the person on camera. The motion rules of this skill still apply (`references/motion-feel.md`).
+Hybrid adds four sub-skills, each a self-contained SKILL.md with its own scripts:
+
+| Need | Sub-skill |
+|---|---|
+| Footage turns into a paper/collage/3D world and back (cut-outs, falling background, parallax city, clouds, literal stats, brand reveal from the world) | `subskills/paper-world/` |
+| A product UI types, sends and responds in sync with the speaker's real words, over continuing B-roll | `subskills/word-synced-ui/` |
+| Transitions between footage and graphics: iris/dot holds, in-scene cloud/paper passes, push-ins, match cuts onto real screens, whip pans; presenting options | `subskills/footage-transitions/` |
+| Frame-numbered timing sheet, temp TTS voice-over, J/L-cuts, soft sound placed on frames, hang-proof mixing, Whisper verification on the final mix | `subskills/vo-beat-timing/` |
+
+Order of work: `vo-beat-timing` §1 (the timing sheet) first, then the visual sub-skills, then
+`vo-beat-timing` §5-6 on every recompose.
+
+**Grade once, for everything.** Build one LUT for the camera's log footage
+(`subskills/paper-world/scripts/log_lut.py`) and apply it to every footage read, so renders composited
+over footage and footage frozen into renders match.
+
+**Running it with agents** (a build like this takes several agents and a few hours of renders):
+- Give every agent a goal with **acceptance checks it must run**: camera assertions, the spike check,
+  word timing on the final mix, UI jitter, and a contact sheet it has actually looked at. Done means
+  checks passed and reported, not "rendered".
+- **Review gates before every expensive render:** a texture or asset preview, full-res frames on the
+  stressed words, then a low-res sheet of the whole move. In one build, these gates caught four
+  problems (drawn-line textures, clipped clouds, a subject too small, a 20-frame white-out) that the
+  numeric checks passed.
+- Agents append a timestamped line to a `PROGRESS-*.md` at every step. A watchdog flags 15 minutes
+  without a line and any ffmpeg running over 10 minutes.
+- Instructions sent to a running agent can go unread while it sits in a long command. Write them into
+  its progress file as well. If an agent stops responding, stop it and start a fresh one scoped to the
+  single remaining fix: it finished that fix in 30 minutes.
+- Work on an external drive for renders and scratch; re-render only the ranges you change and keep the
+  old frames until the recompose passes.
 
 ## Original mode (no reference video)
 

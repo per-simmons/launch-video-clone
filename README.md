@@ -8,7 +8,7 @@ ease on everything. The launch videos that look designed got there by studying a
 shot by shot and fixing timing and easing over many passes. This skill turns that into a loop an
 agent can run, with scripts that measure motion instead of guessing it.
 
-## Two modes
+## Modes
 
 - **Original** (no reference video): pick the category that fits the product (UI showcase,
   abstract 3D diagram, photoreal 3D product, editorial collage, liquid-glass UI, kinetic type
@@ -21,7 +21,13 @@ agent can run, with scripts that measure motion instead of guessing it.
   trails, easing curves and beat maps it can read, and `scripts/compare.py` grades every render
   against the reference frame for frame until they match.
 
-Both modes end by writing a `LESSONS.md` so the skill improves with each video.
+- **Hybrid** (real camera footage + motion graphics): four sub-skills in `subskills/`:
+  `paper-world` (footage → paper-collage 3D world → footage), `word-synced-ui` (a product UI typing the
+  speaker's real words), `footage-transitions` (iris, cloud and paper passes, match cuts, options for
+  review) and `vo-beat-timing` (frame-numbered timing sheet, safe mixing, Whisper checks on the final
+  mix). Each is a standalone SKILL.md with its own scripts, so it can also be installed on its own.
+
+Every mode ends by writing a `LESSONS.md` so the skill improves with each video.
 
 ## Layout
 
@@ -31,6 +37,8 @@ types/                one file per kind of motion: build approach, traps, lesson
 references/           motion-feel rules, living-stills recipes, the corpus of public techniques,
                       and worked example code from past clones (examples/)
 scripts/              analysis, tracking, comparison and sound tools
+subskills/            hybrid-mode sub-skills (paper-world, word-synced-ui, footage-transitions,
+                      vo-beat-timing), each with SKILL.md + scripts/
 ```
 
 ## Install
@@ -56,7 +64,10 @@ In the skill, `$SKILL_DIR` means the folder you copied it to; set `S="$SKILL_DIR
   pip install numpy pillow opencv-python scipy matplotlib
   ```
 - **yt-dlp** to download a reference video (optional)
-- **Blender** for photoreal 3D product shots (optional)
+- **Blender** for photoreal 3D product shots and the paper-world sub-skill (optional)
+- For the hybrid sub-skills (optional): a Whisper with word timestamps (`mlx_whisper` on Apple silicon or
+  `openai-whisper`), a segmentation model (SAM / SAM 2, or Apple Vision on macOS), an inpainting model
+  (LaMa), and Playwright/Chrome for rendering HTML overlays to RGBA frames
 
 Sound (optional):
 - `ELEVENLABS_API_KEY` for `scripts/eleven.py` (music and sound effects)
