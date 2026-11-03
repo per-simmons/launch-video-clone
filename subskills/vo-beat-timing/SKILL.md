@@ -57,6 +57,8 @@ reaches EOF, and an output `-t` did not save it. `scripts/placemix.py` encodes t
 - bound the pad (`apad=whole_dur=<length>`)
 - run every ffmpeg call with `-nostdin`, `stdin=DEVNULL` and a timeout
 - mix to WAV, then mux onto the picture in a **separate** command (`-map 0:v -map 1:a -c:v copy`)
+- never `-shortest` on the mux (it dropped 3 trailing video frames and broke A/V by 3-4 f); give the output the exact `-t` of the cut
+- 29.97 fps sources in a 30 fps cut: retime one-for-one (`setpts`), never `fps=30` (it duplicates a frame every ~33 s and the spike check flags the stutter)
 - land loudness on the **encoded** file: gain + true-peak limiter, re-measured, typically 1-2 passes
 
 Targets: −16 LUFS / −1.5 dBTP for creator video, or the parent skill's −14 LUFS for launch pieces.

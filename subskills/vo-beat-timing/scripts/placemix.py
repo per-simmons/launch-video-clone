@@ -70,7 +70,7 @@ if a.video and a.out:
     for _ in range(3):                                            # gain + limiter, re-measured on the ENCODED file
         ff(["-i", a.video, "-i", a.wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
             "-af", f"volume={gain:.2f}dB,alimiter=limit={lim:.4f}:level=false:attack=3:release=60",
-            "-c:a", "aac", "-b:a", "256k", "-shortest", a.out], t=600)
+            "-c:a", "aac", "-b:a", "256k", "-t", f"{L:.4f}", a.out], t=600)   # exact length; -shortest dropped trailing video frames
         I2, TP = measure(a.out)
         if abs(I2 - a.lufs) <= 0.5: break
         gain += a.lufs - I2
